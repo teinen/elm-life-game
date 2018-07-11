@@ -100,8 +100,8 @@ view model =
 
 viewBoard : LifeGame -> Html Msg
 viewBoard lifegame =
-    div []
-        [ text "Board" ]
+    div [] <|
+        List.map eachRow lifegame.board
 
 
 viewControl : Model -> Html Msg
@@ -121,7 +121,32 @@ viewStatus model =
         ]
 
 
--- View components
+
+-- View Board
+eachRow : List Cell -> Html Msg
+eachRow row =
+    div [ style [ ("clear", "both") ] ]
+        <| List.map eachCell row
+
+eachCell : Cell -> Html Msg
+eachCell cell =
+    case cell of
+        Living ->
+            div [ style [ ("backgroudColor", "white")
+                        , ("width", "1px")
+                        , ("height", "1px")
+                        ]
+                ] []
+
+        Dead ->
+            div [ style [ ("backgroudColor", "black")
+                        , ("width", "1px")
+                        , ("height", "1px")
+                        ]
+                ] []
+
+
+-- View button
 initializeButton : Html Msg
 initializeButton =
     button [ onClick Initialize ] [ text "Initialize" ]
