@@ -3,6 +3,8 @@ module LifeGame exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
+import Time exposing (every, second)
+import Random
 
 
 
@@ -40,7 +42,7 @@ init : Model
 init =
     { generation = 0
     , tick = 4
-    , stopped = True
+    , stopped = False
     , lifegame = initialBoard 50 50
     }
 
@@ -65,13 +67,13 @@ update msg model =
             ( model, Cmd.none )
 
         InitializeLifeGame lifegame ->
-            ( model, Cmd.none )
+            { model | lifegame = lifegame, generation = 0 } ! []
 
         NextGeneration ->
             ( model, Cmd.none )
 
         ToggleStopped ->
-            ( model, Cmd.none )
+            { model | stopped = not model.stopped } ! []
 
         SetTick tick ->
             ( model, Cmd.none )
@@ -84,7 +86,10 @@ update msg model =
 -- Subscriptions
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    if model.tick > 0 && not model.stopped then
+        every ( second / (toFloat model.tick) ) (\t -> NextGeneration)
+    else
+        Sub.none
 
 
 
@@ -133,15 +138,15 @@ eachCell cell =
     case cell of
         Living ->
             div [ style [ ("backgroudColor", "white")
-                        , ("width", "1px")
-                        , ("height", "1px")
+                        , ("width", "0.5px")
+                        , ("height", "0.5px")
                         ]
                 ] []
 
         Dead ->
             div [ style [ ("backgroudColor", "black")
-                        , ("width", "1px")
-                        , ("height", "1px")
+                        , ("width", "0.5px")
+                        , ("height", "0.5px")
                         ]
                 ] []
 
@@ -154,7 +159,7 @@ initializeButton =
 
 stepGenButton : Bool -> Html Msg
 stepGenButton stopped =
-    button [ onClick NextGeneration, not stopped |> disabled ]
+    button [ onClick NextGeneration, stopped |> disabled ]
         [ text "Step 1 Gen" ]
 
 
